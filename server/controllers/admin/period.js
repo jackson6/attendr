@@ -4,18 +4,24 @@ const Period = require('../../models').Period;
 const ClassRoom = require('../../models').Class;
 
 module.exports = {
-    list(req, res) {
+    async list() {
         return Period
           .all({
-            include: [ 'classrooms' ],
+            include: [
+                'classrooms',
+                'holidays'
+            ],
           })
-          .then(period => res.status(200).send(period))
-          .catch(error => res.status(400).send(error));
+          .then(period => { return period })
+          .catch(error => { throw error });
     },
-    retrieve(req, res) {
+    async retrieve(periodId) {
       return Period
-        .findById(req.params.periodId, {
-          include: [ 'classrooms' ],
+        .findById(periodId, {
+          include: [
+              'classrooms',
+              'holidays'
+          ],
         })
         .then(period => {
           if (!period) {
@@ -23,9 +29,9 @@ module.exports = {
               message: 'Period Not Found',
             });
           }
-          return res.status(200).send(period);
+          return period;
         })
-        .catch(error => res.status(400).send(error));
+        .catch(error => { throw error });
     },
     create(req, res) {
       return Period

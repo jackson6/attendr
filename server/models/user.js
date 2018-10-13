@@ -20,7 +20,11 @@ module.exports = (sequelize, DataTypes) => {
     }
   }, {});
   User.associate = function(models) {
-    // associations can be defined here
+      User.belongsToMany(models.Class, {
+          through: 'ClassTeacher',
+          as: 'formClass',
+          foreignKey: 'userId'
+      });
   };
   return User;
 };

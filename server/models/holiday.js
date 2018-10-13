@@ -1,20 +1,21 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Holiday = sequelize.define('Holiday', {
-    periodId: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    name: DataTypes.STRING,
-    startDate: DataTypes.DATE,
-    endDate: DataTypes.DATE
-  }, {});
+      holidayId: {
+          type: DataTypes.STRING,
+          primaryKey: true,
+          allowNull: false,
+      },
+      name: DataTypes.STRING,
+      startDate: DataTypes.STRING,
+      endDate: DataTypes.STRING
+}, {});
   Holiday.associate = function(models) {
-    Holiday.belongsTo(models.Period, {
-      foreignKey: 'periodId',
-      as: 'holidays',
-      onDelete: 'CASCADE',
-    });
+      Holiday.belongsToMany(models.Period, {
+          through: 'HolidayPeriod',
+          as: 'holidayPeriod',
+          foreignKey: 'holidayId'
+      });
   };
   return Holiday;
 };

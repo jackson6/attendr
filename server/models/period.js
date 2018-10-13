@@ -11,10 +11,15 @@ module.exports = (sequelize, DataTypes) => {
     end: DataTypes.DATE
   }, {});
   Period.associate = function(models) {
-    Period.hasMany(models.Class, {
-      foreignKey: 'periodId',
-      as: 'classrooms',
-    });
+      Period.hasMany(models.Class, {
+        foreignKey: 'periodId',
+        as: 'classrooms',
+      });
+      Period.belongsToMany(models.Holiday, {
+          through: 'HolidayPeriod',
+          as: 'holidays',
+          foreignKey: 'periodId'
+      });
   };
   return Period;
 };

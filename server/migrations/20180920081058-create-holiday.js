@@ -2,23 +2,19 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Holidays', {
-      id: {
+      holidayId: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      periodId: {
         type: Sequelize.STRING
       },
       name: {
         type: Sequelize.STRING
       },
       startDate: {
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       endDate: {
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,

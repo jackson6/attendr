@@ -5,33 +5,36 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 module.exports = {
-  async login(req, res) {
-      return User
-        .findById(req.body.user_id)
-        .then(user => {
-          if (!user) {
-            return res.status(404).send({
-              message: 'User Not Found',
+    getUser(id) {
+        try {
+            return User
+                .findById(id)
+        }catch(e){
+            throw e;
+        }
+    },
+    async login(req, res) {
+        return User.findById(req.body.user_id).then(user => {
+            if (!user) {
+                return res.status(404).send({
+                    message: 'User Not Found',
+                });
+            }
+            let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+            if (!passwordIsValid) return res.status(401).send({ auth: false, user: null });
+            user = JSON.parse(JSON.stringify(user))
+            try {
+                delete user.password
+            } catch (e){
+                console.log(e)
+            }
+
+            user.token = jwt.sign({ id: user.userId }, config.secret, {
+                expiresIn: 86400 // expires in 24 hours
             });
-          }
-          let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-          if (!passwordIsValid) return res.status(401).send({ auth: false, user: null });
 
-          user = JSON.parse(JSON.stringify(user))
-
-          try {
-            delete user.password
-          } catch (e){
-            console.log(e)
-          }
-
-          user.token = jwt.sign({ id: user.userId }, config.secret, {
-            expiresIn: 86400 // expires in 24 hours
-          });
-
-          res.status(200).send({ auth: true, user: user });
-        })
-        .catch(error => res.status(400).send(error));
+            res.status(200).send({ auth: true, user: user });
+        }).catch(error => res.status(400).send(error));
     },
     list(req, res) {
         return User
@@ -119,4 +122,21 @@ module.exports = {
         })
         .catch((error) => res.status(400).send(error));
     },
+    async createBulkTeacher(teachers) {
+        try {
+            return User
+                .bulkCreate(teachers)
+        } catch (e){
+            throw e
+        }
+    },
+    async generateBulkTeachers(teachers){
+        let list = [];
+        for(const teacher of teachers){
+            teacher.password = teacher.id + Math.floor((Math.random() * 100) + 1);
+            teacher.role = 2
+            list.push(teacher)
+        }
+        return list
+    }
 };

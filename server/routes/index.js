@@ -7,6 +7,7 @@ const adminUserController = require('../controllers/admin').user;
 const adminPeriodController = require('../controllers/admin').period;
 const adminClassController = require('../controllers/admin').classroom;
 const adminStudentController = require('../controllers/admin').student;
+const adminHolidayController = require('../controllers/admin').holiday;
 
 const auth = require('../middleware/verifyToken');
 
@@ -14,103 +15,194 @@ const xlstojson = require("xls-to-json-lc");
 const xlsxtojson = require("xlsx-to-json-lc");
 
 module.exports = (app) => {
-  app.get('/api', (req, res) => res.status(200).send({
-    message: 'Welcome to the Todos API!',
-  }));
 
-  app.post('/admin/login', adminUserController.login);
-  app.post('/admin/user', adminUserController.create);
-  app.put('/admin/user', adminUserController.update);
-  app.get('/admin/user', adminUserController.list);
-  app.get('/admin/user/:userId', adminUserController.retrieve);
 
-  app.post('/admin/period', adminPeriodController.create);
-  app.put('/admin/period', adminPeriodController.update);
-  app.get('/admin/period', adminPeriodController.list);
-  app.get('/admin/period/:periodId', adminPeriodController.retrieve);
-  
-  app.post('/admin/period/class', auth, async (req, res) => {
-    let grades = ['7', '8', '9', '10', '11', '12', '13'];
-    let streams = ['1', '2', '3', '4', '5'];
-    let period = "001";
+    app.post('/admin/user', adminUserController.create);
+    app.put('/admin/user', adminUserController.update);
+    app.get('/admin/user', adminUserController.list);
 
-    classes = await adminClassController.generateClasses(grades, streams, period)
-    adminClassController.createBulk(classes, req, res)
-    .then(classes => {
-      res.status(200).send(classes)
-    })
-    .catch(error => {
-      res.status(400).send(error)
-    })
+    app.post('/admin/login', adminUserController.login);
+    app.post('/admin/user', adminUserController.create);
+    app.put('/admin/user', adminUserController.update);
+    app.get('/admin/user', adminUserController.list);
+    app.get('/admin/user/:userId', adminUserController.retrieve);
 
-  });
-
-  app.put('/admin/class', adminClassController.update);
-  app.get('/admin/class', adminClassController.list);
-  //app.post('/admin/assign/class', adminClassController.assignClass);
-  app.get('/admin/class/:classId', adminClassController.retrieve);
-
-  app.post('/admin/student', adminStudentController.create);
-  app.put('/admin/student', adminStudentController.update);
-  app.get('/admin/student', adminStudentController.list);
-  app.get('/admin/student/:studentId', adminStudentController.retrieve);
-
-  app.post('/admin/upload/student', upload.single('file'), auth, async (req, res) => {
+    app.post('/admin/period', adminPeriodController.create);
+    app.put('/admin/period', adminPeriodController.update);
     
-    if(!req.file){
-      res.json({ result: false, msg: "No file passed" });
-      return;
-    }
+    app.get('/admin/period', async (req, res) => {
+        try {
+            periods = await adminPeriodController.list();
+            res.status(200).send({result: true, classes:classes})
+        } catch(e) {
+            res.status(200).send({result: false, msg:e})
+        }
+    });
 
-    if(req.file.originalname.split('.')[req.file.originalname.split('.').length-1] === 'xlsx'){
-      exceltojson = xlsxtojson;
-    } else {
-        exceltojson = xlstojson;
-    }
+    app.get('/admin/period/:periodId', async (req, res) => {
+        try {
+            let period = await adminPeriodController.retrieve(req.params.periodId);
+            let holidays = await adminHolidayController.parseHoliday(period.holidays);
+            period.holidays = await holidays;
+            res.status(200).send({result: true, period: holiday})
+        } catch(e) {
+            res.status(400).send({result: false, msg:e})
+        }
+    });
 
-    try {
-      exceltojson({
-          input: req.file.path, //the same path where we uploaded our file
-          output: null, //since we don't need output.json
-          lowerCaseHeaders:true
-      }, function(err, students){
-          if(err) {
-              return res.json({ result: false, msg: err });
-          }
-          
-          adminStudentController.createBulk(students)
-          .then(classes => {
-            res.status(200).send({ result: true, data:students })
-          })
-          .catch(error => {
-            res.status(400).send({ result: false, msg: error })
-          })
-          
-          try {
-              fs.unlinkSync(req.file.path);
-          } catch(e) {
-             console.log(e)
-          }
-      });
-    } catch (e){
-        res.json({ result: false, msg: "Corupted excel file" });
-    }
+    app.post('/admin/period/class', auth, async (req, res) => {
+        let grades = ['7', '8', '9', '10', '11', '12', '13'];
+        let streams = ['1', '2', '3', '4', '5'];
+        let period = "001";
 
-  });
+        classes = await adminClassController.generateClasses(grades, streams, period)
+        adminClassController.createBulk(classes, req, res)
+        .then(classes => {
+            res.status(200).send(classes)
+        })
+        .catch(error => {
+            res.status(400).send(error)
+        })
+    });
 
-  app.post('/admin/assign/student', auth, async (req, res) => {
+    app.put('/admin/class', adminClassController.update);
+    app.get('/admin/class', adminClassController.list);
+    app.get('/admin/class/:classId', adminClassController.retrieve);
 
-    try {
-      let classromm = await adminClassController.getClass(req.body.class_id);
-      let student = await adminStudentController.getStudent(req.body.student_id);
+    app.post('/admin/student', adminStudentController.create);
+    app.put('/admin/student', adminStudentController.update);
+    app.get('/admin/student', adminStudentController.list);
+    app.get('/admin/student/:studentId', adminStudentController.retrieve);
 
-      classromm.addStudent(student, { through: {}});
-      res.status(200).send({ result: true, classroom: classromm, student: student })
-      
-    } catch(e) {
-        res.status(400).send({ result: false, msg: e })
-    }
+    app.post('/admin/upload/student', upload.single('file'), auth, async (req, res) => {
 
-  });
+        if(!req.file){
+            res.json({ result: false, msg: "No file passed" });
+            return;
+        }
 
+        if(req.file.originalname.split('.')[req.file.originalname.split('.').length-1] === 'xlsx'){
+            exceltojson = xlsxtojson;
+        } else {
+            exceltojson = xlstojson;
+        }
+
+        try {
+            exceltojson({
+                input: req.file.path, //the same path where we uploaded our file
+                output: null, //since we don't need output.json
+                lowerCaseHeaders:true
+            }, function(err, students){
+                if(err) {
+                    return res.json({ result: false, msg: err });
+                }
+
+                adminStudentController.createBulk(students)
+                    .then(classes => {
+                        res.status(200).send({ result: true, data:students })
+                    })
+                    .catch(error => {
+                        res.status(400).send({ result: false, msg: error })
+                    })
+
+                try {
+                    fs.unlinkSync(req.file.path);
+                } catch(e) {
+                    console.log(e)
+                }
+            });
+        } catch (e){
+            res.json({ result: false, msg: "Corrupted excel file" });
+        }
+    });
+
+    app.post('/admin/assign/student', auth, async (req, res) => {
+
+        try {
+            let classroom = await adminClassController.getClass(req.body.class_id);
+            let student = await adminStudentController.getStudent(req.body.student_id);
+
+            classroom.addStudent(student, { through: {}});
+            res.status(200).send({ result: true, classroom: classroom, student: student })
+        } catch(e) {
+            res.status(400).send({ result: false, msg: e })
+        }
+    });
+
+
+    app.post('/admin/upload/teacher', upload.single('file'), auth, async (req, res) => {
+
+        if(!req.file){
+            res.json({ result: false, msg: "No file passed" });
+            return;
+        }
+
+        if(req.file.originalname.split('.')[req.file.originalname.split('.').length-1] === 'xlsx'){
+            exceltojson = xlsxtojson;
+        } else {
+            exceltojson = xlstojson;
+        }
+
+        try {
+            exceltojson({
+                input: req.file.path, //the same path where we uploaded our file
+                output: null, //since we don't need output.json
+                lowerCaseHeaders:true
+            }, function(err, list){
+                if(err) {
+                    return res.json({ result: false, msg: err });
+                }
+
+                teachers = adminUserController.generateBulkTeachers(list);
+
+                teachers.forEach(function (teacher) {
+
+                })
+
+                adminUserController.createBulkTeacher(teachers)
+                    .then(classes => {
+                        res.status(200).send({ result: true, data: teachers })
+                    })
+                    .catch(error => {
+                        res.status(400).send({ result: false, msg: error })
+                    })
+
+                try {
+                    fs.unlinkSync(req.file.path);
+                } catch(e) {
+                    console.log(e)
+                }
+            });
+        } catch (e){
+            res.json({ result: false, msg: "Corrupted excel file" });
+        }
+
+    });
+
+    app.post('/admin/assign/teacher', auth, async (req, res) => {
+
+        try {
+            let classroom = await adminClassController.getClass(req.body.class_id);
+            let teacher = await adminUserController.getUser(req.body.user_id);
+
+            if(teacher == undefined){
+                res.status(406).send({ result: false, msg: "Could not find teacher" })
+            }
+
+            if(classroom == undefined){
+                res.status(406).send({ result: false, msg: "Could not find classroom" })
+            }
+
+            adminClassController.assignTeacher(classroom.classId, teacher.userId);
+        } catch(e) {
+            res.status(400).send({ result: false, msg: e })
+        }
+
+    });
+
+    app.post('/admin/holiday', adminHolidayController.create);
+    app.put('/admin/holiday', adminHolidayController.update);
+    app.get('/admin/holiday', adminHolidayController.list);
+    app.get('/admin/holiday/:holidayId', adminHolidayController.retrieve);
+    app.post('/admin/assign/holiday', adminHolidayController.assignHoliday);
 };

@@ -1,31 +1,34 @@
 // PeriodController.js
 
 const Classroom = require('../../models').Class;
-const ClassStudent = require('../../models').ClassStudent;
+const ClassTeacher  = require('../../models').ClassTeacher;
 
 module.exports = {
-    assignClass(req, res) {
-      return ClassStudent
-        .create({
-          classId: req.body.class_id,
-          studentId: req.body.student_id
-        })
-        .then(classroom => res.status(201).send(classroom))
-        .catch(error => res.status(400).send(error));
+    assignTeacher(classroom, teacher){
+        try {
+            return ClassTeacher
+                .create({
+                    classId: classroom,
+                    userId: teacher,
+                })
+        } catch(e) {
+            throw e;
+        }
     },
     getClass(id) {
-      try {
-        return Classroom
-        .findById(id)
-      } catch (e){
-        throw e
-      }
+        try {
+            return Classroom
+                .findById(id)
+        } catch (e) {
+            throw e;
+        }
     },
     list(req, res) {
         return Classroom
-          .findAll({
+          .all({
               include: [
-                'students'
+                  'students',
+                  'formTeachers'
               ]
           })
           .then(classroom => res.status(200).send(classroom))
@@ -33,7 +36,12 @@ module.exports = {
     },
     retrieve(req, res) {
         return Classroom
-          .findById(req.params.classId, {})
+          .findById(req.params.classId, {
+              include: [
+                  'students',
+                  'formTeachers'
+              ]
+          })
           .then(classroom => {
             if (!classroom) {
               return res.status(404).send({
@@ -48,7 +56,7 @@ module.exports = {
       return Classroom
         .create({
           classId: req.body.class_id,
-          peroidId: req.body.peroid_id,
+          periodId: req.body.period_id,
           grade: req.body.grade,
           stream: req.body.stream,
         })
