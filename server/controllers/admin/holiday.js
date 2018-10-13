@@ -7,10 +7,10 @@ module.exports = {
     assignHoliday(req, res){
         return HolidayPeriod
             .create({
-                periodId: req.body.period_id,
-                holidayId: req.body.holiday_id,
-                startYear: req.body.start_year,
-                endYear: req.body.end_year,
+                periodId: req.body.periodId,
+                holidayId: req.body.holidayId,
+                startYear: req.body.startYear,
+                endYear: req.body.endYear,
             })
             .then(holiday => res.status(200).send({result: true, holiday:holiday}))
             .catch(error => res.status(400).send({result: false, msg: error}));
@@ -37,10 +37,10 @@ module.exports = {
     create(req, res) {
         return Holiday
             .create({
-                holidayId: new Date(req.body.start_date).getTime().toString(),
+                holidayId: new Date(req.body.startDate).getTime().toString(),
                 name: req.body.name,
-                startDate: req.body.start_date,
-                endDate: req.body.end_date,
+                startDate: req.body.startDate,
+                endDate: req.body.endDate,
             })
             .then(holiday => res.status(201).send({result: true, holiday:holiday}))
             .catch(error => res.status(400).send({result: false, msg: error}));
@@ -57,8 +57,8 @@ module.exports = {
                 return holiday
                     .update({
                         name: req.body.name || holiday.name,
-                        startDate: req.body.start_date || holiday.startDate,
-                        endDate: req.body.end_date || holiday.endDate
+                        startDate: req.body.startDate || holiday.startDate,
+                        endDate: req.body.endDate || holiday.endDate
                     })
                     .then(() => res.status(200).send({result: true, holiday:holiday}))  // Send back the updated holiday.
                     .catch((error) => res.status(400).send({result: false, msg: error}));

@@ -27,7 +27,6 @@ module.exports = (app) => {
     app.get('/admin/user', adminUserController.list);
     app.get('/admin/user/:userId', adminUserController.retrieve);
 
-    app.post('/admin/period', adminPeriodController.create);
     app.put('/admin/period', adminPeriodController.update);
     
     app.get('/admin/period', adminPeriodController.list);
@@ -43,19 +42,23 @@ module.exports = (app) => {
         }
     });
 
-    app.post('/admin/period/class', auth, async (req, res) => {
-        let grades = ['7', '8', '9', '10', '11', '12', '13'];
-        let streams = ['1', '2', '3', '4', '5'];
-        let period = "001";
+    app.post('/admin/period', auth, async (req, res) => {
 
-        classes = await adminClassController.generateClasses(grades, streams, period)
-        adminClassController.createBulk(classes, req, res)
-        .then(classes => {
-            res.status(200).send(classes)
-        })
-        .catch(error => {
-            res.status(400).send(error)
-        })
+        try {
+            let period = await adminPeriodController.create(req.body.periodId, req.body.name, req.body.start, req.body.end);
+            let classes = await adminClassController.generateClasses(req.body.grades, req.body.streams, period.periodId);
+
+            adminClassController.createBulk(classes, req, res)
+            .then(classes => {
+                res.status(200).send(classes)
+            })
+            .catch(error => {
+                res.status(400).send({result: false, msg: error})
+            })
+        } catch (e) {
+            res.status(400).send({result: false, msg: e})
+        }
+
     });
 
     app.put('/admin/class', adminClassController.update);
@@ -112,8 +115,8 @@ module.exports = (app) => {
     app.post('/admin/assign/student', auth, async (req, res) => {
 
         try {
-            let classroom = await adminClassController.getClass(req.body.class_id);
-            let student = await adminStudentController.getStudent(req.body.student_id);
+            let classroom = await adminClassController.getClass(req.body.classId);
+            let student = await adminStudentController.getStudent(req.body.studentId);
 
             classroom.addStudent(student, { through: {}});
             res.status(200).send({ result: true, classroom: classroom, student: student })
@@ -175,8 +178,8 @@ module.exports = (app) => {
     app.post('/admin/assign/teacher', auth, async (req, res) => {
 
         try {
-            let classroom = await adminClassController.getClass(req.body.class_id);
-            let teacher = await adminUserController.getUser(req.body.user_id);
+            let classroom = await adminClassController.getClass(req.body.classId);
+            let teacher = await adminUserController.getUser(req.body.userId);
 
             if(teacher == undefined){
                 res.status(406).send({ result: false, msg: "Could not find teacher" })

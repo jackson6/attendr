@@ -14,7 +14,7 @@ module.exports = {
         }
     },
     async login(req, res) {
-        return User.findById(req.body.user_id).then(user => {
+        return User.findById(req.body.userId).then(user => {
             if (!user) {
                 return res.status(404).send({
                     result: false,
@@ -72,9 +72,9 @@ module.exports = {
     create(req, res) {
       return User
         .create({
-          userId: req.body.user_id,
-          firstName: req.body.first_name,
-          lastName: req.body.last_name,
+          userId: req.body.userId,
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
           role: req.body.role,
           title: req.body.title,
           password: bcrypt.hashSync(req.body.password, 8)
@@ -104,8 +104,8 @@ module.exports = {
           }
           return user
             .update({
-              firstName: req.body.first_name || user.firstName,
-              lastName: req.body.last_name || user.lastName,
+              firstName: req.body.firstName || user.firstName,
+              lastName: req.body.lastName || user.lastName,
               role: req.body.role || user.role,
               title: req.body.title || user.title,
               passowrd: bcrypt.hashSync(req.body.password, 8) || user.passowrd

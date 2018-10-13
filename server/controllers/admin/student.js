@@ -33,9 +33,9 @@ module.exports = {
     create(req, res) {
       return Student
         .create({
-          studentId: req.body.student_id,
-          firstName: req.body.first_name,
-          lastName: req.body.last_name,
+          studentId: req.body.studentId,
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
           gender: req.body.gender
         })
         .then(student => res.status(201).send({result: true, student: student}))
@@ -60,8 +60,8 @@ module.exports = {
             }
             return student
               .update({
-                firstName: req.body.first_name || student.firstName,
-                lastName: req.body.last_name || student.lastName,
+                firstName: req.body.firstName || student.firstName,
+                lastName: req.body.lastName || student.lastName,
                 gender: req.body.gender || student.gender,
               })
               .then(() => res.status(200).send({result: true, student: student}))  // Send back the updated student.

@@ -33,16 +33,15 @@ module.exports = {
         })
         .catch(error => { throw error });
     },
-    create(req, res) {
+    async create(periodId, name, start, end) {
       return Period
         .create({
-          periodId: req.body.period_id,
-          name: req.body.name,
-          start: req.body.start,
-          end: req.body.end,
+          periodId: periodId,
+          name: name,
+          start: start,
+          end: end,
         })
-        .then(period => res.status(201).send({result: true, period:period}))
-        .catch(error => res.status(400).send({result: false, msg:error}));
+        .catch(error => { throw error });
     },
     update(req, res) {
         return Period

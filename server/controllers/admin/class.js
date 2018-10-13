@@ -56,8 +56,8 @@ module.exports = {
     create(req, res) {
       return Classroom
         .create({
-          classId: req.body.class_id,
-          periodId: req.body.period_id,
+          classId: req.body.classId,
+          periodId: req.body.periodId,
           grade: req.body.grade,
           stream: req.body.stream,
         })
