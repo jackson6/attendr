@@ -31,7 +31,7 @@ module.exports = {
                   'formTeachers'
               ]
           })
-          .then(classroom => res.status(200).send(classroom))
+          .then(classrooms => res.status(200).send({result: true, classrooms: classrooms}))
           .catch(error => res.status(400).send({result: false, msg: error}));
     },
     retrieve(req, res) {
@@ -45,12 +45,13 @@ module.exports = {
           .then(classroom => {
             if (!classroom) {
               return res.status(404).send({
-                message: 'Classroom Not Found',
+                  result: false,
+                  message: 'Classroom Not Found',
               });
             }
-            return res.status(200).send(classroom);
+            return res.status(200).send({result: true, classroom: classroom});
           })
-          .catch(error => res.status(400).send(error));
+          .catch(error => res.status(400).send({result: false, msg: error}));
     },
     create(req, res) {
       return Classroom
@@ -60,8 +61,8 @@ module.exports = {
           grade: req.body.grade,
           stream: req.body.stream,
         })
-        .then(classroom => res.status(201).send(classroom))
-        .catch(error => res.status(400).send(error));
+        .then(classroom => res.status(201).send({result: true, classroom: classroom}))
+        .catch(error => res.status(400).send({result: false, msg: error}));
     },
     async createBulk(classes) {
       try {
@@ -85,10 +86,10 @@ module.exports = {
                 grade: req.body.grade || classroom.grade,
                 stream: req.body.stream || classroom.stream
               })
-              .then(() => res.status(200).send(classroom))  // Send back the updated period.
-              .catch((error) => res.status(400).send(error));
+              .then(() => res.status(200).send({result: true, classroom: classroom}))  // Send back the updated period.
+              .catch((error) => res.status(400).send({result: false, msg: error}));
           })
-          .catch((error) => res.status(400).send(error));
+          .catch((error) => res.status(400).send({result: false, msg: error}));
     },
     async generateClasses(grades, streams, period){
       let classes = [];

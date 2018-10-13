@@ -30,21 +30,14 @@ module.exports = (app) => {
     app.post('/admin/period', adminPeriodController.create);
     app.put('/admin/period', adminPeriodController.update);
     
-    app.get('/admin/period', async (req, res) => {
-        try {
-            periods = await adminPeriodController.list();
-            res.status(200).send({result: true, classes:classes})
-        } catch(e) {
-            res.status(200).send({result: false, msg:e})
-        }
-    });
+    app.get('/admin/period', adminPeriodController.list);
 
     app.get('/admin/period/:periodId', async (req, res) => {
         try {
             let period = await adminPeriodController.retrieve(req.params.periodId);
-            let holidays = await adminHolidayController.parseHoliday(period.holidays);
-            period.holidays = await holidays;
-            res.status(200).send({result: true, period: holiday})
+            period.holidays = await adminHolidayController.parseHoliday(period.holidays);
+
+            res.status(200).send({result: true, period: period})
         } catch(e) {
             res.status(400).send({result: false, msg:e})
         }

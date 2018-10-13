@@ -1,19 +1,19 @@
 // PeriodController.js
 
 const Period = require('../../models').Period;
-const ClassRoom = require('../../models').Class;
 
 module.exports = {
-    async list() {
+    async list(req, res) {
         return Period
-          .all({
-            include: [
-                'classrooms',
-                'holidays'
-            ],
-          })
-          .then(period => { return period })
-          .catch(error => { throw error });
+          .all({})
+          .then(periods => res.status(200).send({
+              result: true,
+              periods: periods
+          }))
+          .catch(error => res.status(400).send({
+              result: false,
+              msg: error
+          }));
     },
     async retrieve(periodId) {
       return Period
@@ -41,8 +41,8 @@ module.exports = {
           start: req.body.start,
           end: req.body.end,
         })
-        .then(period => res.status(201).send(period))
-        .catch(error => res.status(400).send(error));
+        .then(period => res.status(201).send({result: true, period:period}))
+        .catch(error => res.status(400).send({result: false, msg:error}));
     },
     update(req, res) {
         return Period
@@ -61,9 +61,9 @@ module.exports = {
                 start: req.body.start || period.start,
                 end: req.body.end || period.end,
               })
-              .then(() => res.status(200).send(period))  // Send back the updated period.
-              .catch((error) => res.status(400).send(error));
+              .then(() => res.status(200).send({result: true, period:period}))  // Send back the updated period.
+              .catch((error) => res.status(400).send({result: false, msg:error}));
           })
-          .catch((error) => res.status(400).send(error));
+          .catch((error) => res.status(400).send({result: false, msg:error}));
     },
 };

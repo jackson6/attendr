@@ -17,11 +17,12 @@ module.exports = {
         return User.findById(req.body.user_id).then(user => {
             if (!user) {
                 return res.status(404).send({
+                    result: false,
                     message: 'User Not Found',
                 });
             }
             let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-            if (!passwordIsValid) return res.status(401).send({ auth: false, user: null });
+            if (!passwordIsValid) return res.status(401).send({ result: false, user: null });
             user = JSON.parse(JSON.stringify(user))
             try {
                 delete user.password
@@ -33,8 +34,8 @@ module.exports = {
                 expiresIn: 86400 // expires in 24 hours
             });
 
-            res.status(200).send({ auth: true, user: user });
-        }).catch(error => res.status(400).send(error));
+            res.status(200).send({ result: true, user: user });
+        }).catch(error => res.status(400).send({result: false, msg: error}));
     },
     list(req, res) {
         return User
@@ -42,9 +43,9 @@ module.exports = {
             attributes: ['userId', 'firstName', 'lastName', 'role', 'title', 'createdAt', 'updatedAt'],
           })
           .then(user => {
-            res.status(200).send(user)
+            res.status(200).send({result: true, user: user})
           })
-          .catch(error => res.status(400).send(error));
+          .catch(error => res.status(400).send({result: false, msg: error}));
     },
     retrieve(req, res) {
       return User
@@ -52,7 +53,8 @@ module.exports = {
         .then(user => {
           if (!user) {
             return res.status(404).send({
-              message: 'User Not Found',
+                result: false,
+                message: 'User Not Found',
             });
           }
           user = JSON.parse(JSON.stringify(user))
@@ -63,9 +65,9 @@ module.exports = {
             console.log(e)
           }
 
-          return res.status(200).send(user);
+          return res.status(200).send({result: true, user: user});
         })
-        .catch(error => res.status(400).send(error));
+        .catch(error => res.status(400).send({result: false, msg: error}));
     },
     create(req, res) {
       return User
@@ -86,9 +88,9 @@ module.exports = {
             console.log(e)
           }
 
-          res.status(201).send(user)
+          res.status(200).send({result: true, user: user})
         })
-        .catch(error => res.status(400).send(error));
+        .catch(error => res.status(400).send({result: false, msg: error}));
     },
     update(req, res) {
       return User
@@ -96,7 +98,8 @@ module.exports = {
         .then(user => {
           if (!user) {
             return res.status(404).send({
-              message: 'User Not Found',
+                result: false,
+                message: 'User Not Found',
             });
           }
           return user
@@ -116,11 +119,11 @@ module.exports = {
               console.log(e)
             }
 
-            res.status(200).send(user)
+            res.status(200).send({result: true, user: user})
           })  // Send back the updated user.
-            .catch((error) => res.status(400).send(error));
+            .catch((error) => res.status(400).send({result: false, msg: error}));
         })
-        .catch((error) => res.status(400).send(error));
+        .catch((error) => res.status(400).send({result: false, msg: error}));
     },
     async createBulkTeacher(teachers) {
         try {

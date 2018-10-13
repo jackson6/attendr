@@ -14,8 +14,8 @@ module.exports = {
     list(req, res) {
         return Student
           .all()
-          .then(student => res.status(200).send(student))
-          .catch(error => res.status(400).send(error));
+          .then(students => res.status(200).send({result: true, students: students}))
+          .catch(error => res.status(400).send({result: false, msg: error}));
     },
     retrieve(req, res) {
       return Student
@@ -26,9 +26,9 @@ module.exports = {
               message: 'Student Not Found',
             });
           }
-          return res.status(200).send(student);
+          return res.status(200).send({result: true, student: student});
         })
-        .catch(error => res.status(400).send(error));
+        .catch(error => res.status(400).send({result: false, msg: error}));
     },
     create(req, res) {
       return Student
@@ -38,8 +38,8 @@ module.exports = {
           lastName: req.body.last_name,
           gender: req.body.gender
         })
-        .then(student => res.status(201).send(student))
-        .catch(error => res.status(400).send(error));
+        .then(student => res.status(201).send({result: true, student: student}))
+        .catch(error => res.status(400).send({result: false, msg: error}));
     },
     async createBulk(students) {
       try {
@@ -64,9 +64,9 @@ module.exports = {
                 lastName: req.body.last_name || student.lastName,
                 gender: req.body.gender || student.gender,
               })
-              .then(() => res.status(200).send(student))  // Send back the updated student.
-              .catch((error) => res.status(400).send(error));
+              .then(() => res.status(200).send({result: true, student: student}))  // Send back the updated student.
+              .catch((error) => res.status(400).send({result: false, msg: error}));
           })
-          .catch((error) => res.status(400).send(error));
+          .catch((error) => res.status(400).send({result: false, msg: error}));
     },
 };

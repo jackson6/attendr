@@ -12,13 +12,13 @@ module.exports = {
                 startYear: req.body.start_year,
                 endYear: req.body.end_year,
             })
-            .then(holiday => res.status(200).send(holiday))
+            .then(holiday => res.status(200).send({result: true, holiday:holiday}))
             .catch(error => res.status(400).send({result: false, msg: error}));
     },
     list(req, res) {
         return Holiday
             .all({})
-            .then(holiday => res.status(200).send(holiday))
+            .then(holiday => res.status(200).send({result: true, holiday:holiday}))
             .catch(error => res.status(400).send({result: false, msg: error}));
     },
     retrieve(req, res) {
@@ -30,9 +30,9 @@ module.exports = {
                         message: 'Classroom Not Found',
                     });
                 }
-                return res.status(200).send(holiday);
+                return res.status(200).send({result: true, holiday:holiday});
             })
-            .catch(error => res.status(400).send(error));
+            .catch(error => res.status(400).send({result: false, msg: error}));
     },
     create(req, res) {
         return Holiday
@@ -42,8 +42,8 @@ module.exports = {
                 startDate: req.body.start_date,
                 endDate: req.body.end_date,
             })
-            .then(holiday => res.status(201).send(holiday))
-            .catch(error => res.status(400).send(error));
+            .then(holiday => res.status(201).send({result: true, holiday:holiday}))
+            .catch(error => res.status(400).send({result: false, msg: error}));
     },
     update(req, res) {
         return Holiday
@@ -60,10 +60,10 @@ module.exports = {
                         startDate: req.body.start_date || holiday.startDate,
                         endDate: req.body.end_date || holiday.endDate
                     })
-                    .then(() => res.status(200).send(holiday))  // Send back the updated holiday.
-                    .catch((error) => res.status(400).send(error));
+                    .then(() => res.status(200).send({result: true, holiday:holiday}))  // Send back the updated holiday.
+                    .catch((error) => res.status(400).send({result: false, msg: error}));
             })
-            .catch((error) => res.status(400).send(error));
+            .catch((error) => res.status(400).send({result: false, msg: error}));
     },
     async getDays( date1, date2 ) {
         var one_day=1000*60*60*24;
@@ -102,7 +102,7 @@ module.exports = {
                 throw e;
             }
         }
-        return period
+        return dates;
     }
 
 };
