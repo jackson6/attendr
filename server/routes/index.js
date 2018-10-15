@@ -50,7 +50,8 @@ module.exports = (app) => {
 
             adminClassController.createBulk(classes, req, res)
             .then(classes => {
-                res.status(200).send(classes)
+                period.classes = classes
+                res.status(200).send(period)
             })
             .catch(error => {
                 res.status(400).send({result: false, msg: error})
