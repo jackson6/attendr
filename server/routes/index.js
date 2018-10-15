@@ -31,9 +31,12 @@ module.exports = (app) => {
     app.get('/admin/period/:periodId', async (req, res) => {
         try {
             let period = await adminPeriodController.retrieve(req.params.periodId);
-            period.holidays = await adminHolidayController.parseHoliday(period.holidays);
+            let holidays = await adminHolidayController.parseHoliday(period.holidays);
+            var jsonString = JSON.stringify(period);
+            var result = JSON.parse(jsonString);
+            result.holidays = holidays;
 
-            res.status(200).send({result: true, period: period})
+                res.status(200).send({result: true, period: result})
         } catch(e) {
             res.status(400).send({result: false, msg:e})
         }

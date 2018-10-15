@@ -86,7 +86,7 @@ module.exports = {
         return result;
     },
     async parseHoliday(holidays){
-        let dates = [];
+        let dates = {};
 
         for(const holiday of holidays){
             try {
@@ -95,7 +95,14 @@ module.exports = {
                 let days = await this.getDays(start_date, end_date);
                 for(var i=0; i<(days+1); i++) {
                     let day = await this.addDays(holiday.startDate, i);
-                    dates.push(day)
+                    if (dates[holiday.holidayId] != undefined) {
+                        dates[holiday.holidayId].days.push(day);
+                    } else {
+                        dates[holiday.holidayId] = {};
+                        dates[holiday.holidayId].name = holiday.name;
+                        dates[holiday.holidayId].days = [];
+                        dates[holiday.holidayId].days.push(day);
+                    }
                 }
             }catch(e){
                 console.log("error", e);
