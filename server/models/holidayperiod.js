@@ -2,12 +2,12 @@
 module.exports = (sequelize, DataTypes) => {
   const HolidayPeriod = sequelize.define('HolidayPeriod', {
     periodId: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         allowNull: false,
     },
     holidayId: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         allowNull: false,
     },

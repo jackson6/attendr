@@ -2,9 +2,10 @@
 module.exports = (sequelize, DataTypes) => {
   const Period = sequelize.define('Period', {
     periodId: {
-      type: DataTypes.STRING,
-      primaryKey: true,
-      allowNull: false,
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
     },
     name: DataTypes.STRING,
     start: DataTypes.DATE,

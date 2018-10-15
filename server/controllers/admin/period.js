@@ -33,10 +33,9 @@ module.exports = {
         })
         .catch(error => { throw error });
     },
-    async create(periodId, name, start, end) {
+    async create(name, start, end) {
       return Period
         .create({
-          periodId: periodId,
           name: name,
           start: start,
           end: end,

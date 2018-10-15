@@ -2,9 +2,10 @@
 module.exports = (sequelize, DataTypes) => {
   const ClassStudent = sequelize.define('ClassStudent', {
     classId: {
-      type: DataTypes.STRING,
-      primaryKey: true,
-      allowNull: false
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false
     },
     studentId: {
       type: DataTypes.STRING,

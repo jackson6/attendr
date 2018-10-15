@@ -5,7 +5,7 @@ module.exports = {
       classId: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       studentId: {
         allowNull: false,

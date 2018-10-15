@@ -3,12 +3,13 @@
 module.exports = (sequelize, DataTypes) => {
   const Class = sequelize.define('Class', {
     classId: {
-      type: DataTypes.STRING,
-      primaryKey: true,
-      allowNull: false,
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+        allowNull: false,
     },
     periodId: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       primaryKey: true,
       allowNull: false,
     },

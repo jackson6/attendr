@@ -8,6 +8,7 @@ const adminPeriodController = require('../controllers/admin').period;
 const adminClassController = require('../controllers/admin').classroom;
 const adminStudentController = require('../controllers/admin').student;
 const adminHolidayController = require('../controllers/admin').holiday;
+const adminGradeController = require('../controllers/admin').grade;
 
 const auth = require('../middleware/verifyToken');
 
@@ -24,16 +25,20 @@ module.exports = (app) => {
     app.get('/admin/user/:userId', auth, adminUserController.retrieve);
     app.delete('/admin/user', auth, adminUserController.delete);
 
-    app.put('/admin/period', adminPeriodController.update);
-    
-    app.get('/admin/period', adminPeriodController.list);
+    app.get('/admin/grade', auth, adminGradeController.list);
+    app.get('/admin/grade/:gradeId', auth, adminGradeController.retrieve);
+    app.post('/admin/grade', auth, adminGradeController.create);
+    app.put('/admin/grade', auth, adminGradeController.update);
+    app.delete('/admin/grade', auth, adminGradeController.delete);
 
+    app.put('/admin/period', adminPeriodController.update);
+    app.get('/admin/period', adminPeriodController.list);
     app.get('/admin/period/:periodId', async (req, res) => {
         try {
             let period = await adminPeriodController.retrieve(req.params.periodId);
             let holidays = await adminHolidayController.parseHoliday(period.holidays);
-            var jsonString = JSON.stringify(period);
-            var result = JSON.parse(jsonString);
+            let jsonString = JSON.stringify(period);
+            let result = JSON.parse(jsonString);
             result.holidays = holidays;
 
                 res.status(200).send({result: true, period: result})
@@ -41,17 +46,22 @@ module.exports = (app) => {
             res.status(400).send({result: false, msg:e})
         }
     });
-
     app.post('/admin/period', auth, async (req, res) => {
 
         try {
-            let period = await adminPeriodController.create(req.body.periodId, req.body.name, req.body.start, req.body.end);
-            let classes = await adminClassController.generateClasses(req.body.grades, req.body.streams, period.periodId);
+            let period = await adminPeriodController.create(req.body.name, req.body.start, req.body.end);
+            let grades = await adminGradeController.getGrades();
+
+            let classes = await adminClassController.generateClasses(grades, period.periodId);
 
             adminClassController.createBulk(classes, req, res)
             .then(classes => {
-                period.classes = classes
-                res.status(200).send(period)
+                let periodString = JSON.stringify(period);
+                let periodJson = JSON.parse(periodString);
+
+                periodJson.classes = classes;
+
+                res.status(200).send({result:true, period: periodJson})
             })
             .catch(error => {
                 res.status(400).send({result: false, msg: error})
@@ -120,7 +130,7 @@ module.exports = (app) => {
             let student = await adminStudentController.getStudent(req.body.studentId);
 
             classroom.addStudent(student, { through: {}});
-            res.status(200).send({ result: true, classroom: classroom, student: student })
+            res.status(200).send({ result: true, classroom: classroom, student: student });
         } catch(e) {
             res.status(400).send({ result: false, msg: e })
         }
@@ -191,6 +201,7 @@ module.exports = (app) => {
             }
 
             adminClassController.assignTeacher(classroom.classId, teacher.userId);
+            res.status(200).send({ result: true, classroom: classroom, teacher: teacher })
         } catch(e) {
             res.status(400).send({ result: false, msg: e })
         }

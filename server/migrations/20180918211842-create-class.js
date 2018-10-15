@@ -4,12 +4,13 @@ module.exports = {
       classId: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+	autoIncrement: true,
+        type: Sequelize.INTEGER
       },
       periodId: {
         allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       grade: {
         type: Sequelize.STRING

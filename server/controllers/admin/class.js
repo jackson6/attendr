@@ -56,7 +56,6 @@ module.exports = {
     create(req, res) {
       return Classroom
         .create({
-          classId: req.body.classId,
           periodId: req.body.periodId,
           grade: req.body.grade,
           stream: req.body.stream,
@@ -91,12 +90,11 @@ module.exports = {
           })
           .catch((error) => res.status(400).send({result: false, msg: error}));
     },
-    async generateClasses(grades, streams, period){
+    async generateClasses(grades, period){
       let classes = [];
       for(const grade of grades){
-        for(const stream of streams){
-          let classroom = period + grade + stream;
-          classes.push({grade:grade, stream:stream, periodId: period, classId: classroom})
+        for(const stream of grade.streams){
+          classes.push({grade:grade.grade, stream:stream, periodId: period})
         }
       }
       return classes

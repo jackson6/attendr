@@ -5,12 +5,12 @@ module.exports = {
       periodId: {
 	allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       holidayId: {
 	allowNull: false,
         primaryKey: true,
-        type: Sequelize.STRING
+        type: Sequelize.INTEGER
       },
       startYear: {
           allowNull: false,

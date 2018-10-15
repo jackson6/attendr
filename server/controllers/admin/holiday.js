@@ -37,7 +37,6 @@ module.exports = {
     create(req, res) {
         return Holiday
             .create({
-                holidayId: new Date(req.body.startDate).getTime().toString(),
                 name: req.body.name,
                 startDate: req.body.startDate,
                 endDate: req.body.endDate,

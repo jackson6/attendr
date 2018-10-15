@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const ClassTeacher = sequelize.define('ClassTeacher', {
     classId: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         allowNull: false
     },
