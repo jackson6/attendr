@@ -16,16 +16,13 @@ const xlsxtojson = require("xlsx-to-json-lc");
 
 module.exports = (app) => {
 
-
-    app.post('/admin/user', adminUserController.create);
-    app.put('/admin/user', adminUserController.update);
-    app.get('/admin/user', adminUserController.list);
-
     app.post('/admin/login', adminUserController.login);
     app.post('/admin/user', adminUserController.create);
-    app.put('/admin/user', adminUserController.update);
-    app.get('/admin/user', adminUserController.list);
-    app.get('/admin/user/:userId', adminUserController.retrieve);
+    app.put('/admin/user', auth, adminUserController.update);
+    app.get('/admin/user', auth, adminUserController.list);
+    app.get('/admin/user/:userId', auth, adminUserController.retrieve);
+    app.get('/admin/user/:userId', auth, adminUserController.retrieve);
+    app.delete('/admin/user', auth, adminUserController.delete);
 
     app.put('/admin/period', adminPeriodController.update);
     

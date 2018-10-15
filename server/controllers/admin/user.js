@@ -130,6 +130,25 @@ module.exports = {
         })
         .catch((error) => res.status(400).send({result: false, msg: error}));
     },
+    delete(req, res){
+        return User
+            .findById(req.body.userId, {})
+            .then(user => {
+                if (!user) {
+                    return res.status(404).send({
+                        result: false,
+                        message: 'User Not Found',
+                    });
+                }
+                user.destroy()
+                    .then(() => {
+
+                    res.status(200).send({result: true, msg: "User deleted successfully"})
+                })  // Send back the updated user.
+                    .catch((error) => res.status(400).send({result: false, msg: error}));
+            })
+            .catch((error) => res.status(400).send({result: false, msg: error}));
+    },
     async createBulkTeacher(teachers) {
         try {
             return User
