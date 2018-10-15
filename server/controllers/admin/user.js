@@ -102,13 +102,18 @@ module.exports = {
                 message: 'User Not Found',
             });
           }
+          let new_password = undefined;
+          if(req.body.password != undefined) {
+              new_password = bcrypt.hashSync(req.body.password, 8)
+          }
+
           return user
             .update({
               firstName: req.body.firstName || user.firstName,
               lastName: req.body.lastName || user.lastName,
               role: req.body.role || user.role,
               title: req.body.title || user.title,
-              passowrd: bcrypt.hashSync(req.body.password, 8) || user.passowrd
+              passowrd: new_password || user.passowrd
             })
           .then(() => {
             user = JSON.parse(JSON.stringify(user))
