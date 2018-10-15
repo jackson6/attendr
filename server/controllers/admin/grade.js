@@ -59,7 +59,7 @@ module.exports = {
                 return grade
                     .update({
                         grade: req.body.grade || grade.grade,
-                        lastName: req.body.streams || grade.streams,
+                        streams: req.body.streams || grade.streams,
                     })
                     .then(() => res.status(200).send({result: true, grade: grade}))  // Send back the updated student.
                     .catch((error) => res.status(400).send({result: false, msg: error}));
